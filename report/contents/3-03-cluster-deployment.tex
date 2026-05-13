@@ -1,0 +1,84 @@
+\subsection{Развёртывание окружения нагрузочного тестирования}
+\label{subsec:deployment}
+
+Нагрузочные эксперименты проводились на кластере из пяти узлов. Программный стек:
+Apache Flink (версия 2.x) как вычислительный движок, Apache Paimon (версия 1.4) с
+модулем \texttt{paimon-vortex} как табличный формат, Java~17 в качестве среды
+исполнения, объектное хранилище, совместимое с S3 (на базе Apache Ozone~\cite{ozone-docs}), как бэкенд
+хранения. На каждом узле запускаются два менеджера задач (TaskManager) по 30 слотов
+--- итого 10 менеджеров задач и 300 слотов в кластере; на одном из узлов
+дополнительно работает менеджер заданий (JobManager). Решение запускать два менеджера
+задач на узел вместо одного с 60 слотами принято осознанно: меньший размер кучи на
+процесс (\SI{100}{\giga\byte} вместо \SI{200}{\giga\byte}) сокращает паузы полной
+сборки мусора, а изоляция процессов означает, что пауза одного менеджера задач не
+блокирует второй; это особенно важно для формата Parquet, чей путь декодирования и
+агрегации полностью находится в куче JVM, при высоком параллелизме.
+
+Развёртывание, обновление конфигурации и управление жизненным циклом кластера
+автоматизированы средствами Ansible~\cite{ansible-docs}: набор ролей и плейбуков (\texttt{start.yml},
+\texttt{stop.yml}, \texttt{config-update.yml}) разворачивает Flink на узлах,
+раскладывает зависимости (в том числе артефакт Paimon с нативной библиотекой
+Vortex), формирует конфигурацию из шаблонов и запускает или останавливает менеджеры
+заданий и задач. Отдельный плейбук (\texttt{submit-job.yml}) собирает задание,
+копирует его и зависимости на узел менеджера заданий, запускает через клиент Flink,
+извлекает идентификатор задания и опрашивает его состояние до завершения, после чего
+забирает с узла файл метрик. Поскольку доступ к хранилищу на стенде защищён
+Kerberos, добавлен плейбук обновления билетов (\texttt{krb-renew.yml}), выполняемый
+первым во всех остальных плейбуках. Запуск нагрузочной серии для нескольких форматов
+оформлен сценарием-обёрткой, который последовательно прогоняет задание для каждого
+формата с предварительной очисткой состояния и принудительной остановкой
+параллельных заданий.
+
+Схема развёртывания и взаимодействия компонентов при проведении эксперимента
+приведена на рисунке~\ref{fig:deployment}.
+
+\begin{figure}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+    font=\small,
+    >={Stealth[length=2.4mm]},
+    node distance=6mm,
+    comp/.style={draw, rounded corners=2pt, align=center, minimum height=9mm, fill=black!4, inner sep=4pt},
+    tm/.style={draw, rounded corners=1.5pt, align=center, minimum height=6mm, minimum width=14mm, fill=black!8, font=\footnotesize},
+    nodebox/.style={draw, dashed, rounded corners=3pt, inner sep=6pt},
+    flow/.style={->, thick},
+    dataflow/.style={->, thick, dash pattern=on 3pt off 2pt},
+  ]
+  % --- Dev machine + Ansible ---
+  \node[comp] (dev) {Рабочая станция\\(Ansible: \texttt{start}, \texttt{stop},\\\texttt{config-update}, \texttt{submit-job})};
+  % --- JobManager node ---
+  \node[comp, right=22mm of dev, yshift=14mm] (jm) {Узел~1: JobManager\\(драйвер задания,\\файл метрик CSV)};
+  % --- TM nodes ---
+  \node[tm, right=30mm of jm, yshift=22mm] (tm1a) {TaskManager};
+  \node[tm, below=2.5mm of tm1a] (tm1b) {TaskManager};
+  \node[nodebox, fit=(tm1a)(tm1b), label={[font=\footnotesize]above:Узел~1}] (n1) {};
+
+  \node[tm, below=10mm of tm1b] (tm2a) {TaskManager};
+  \node[tm, below=2.5mm of tm2a] (tm2b) {TaskManager};
+  \node[nodebox, fit=(tm2a)(tm2b), label={[font=\footnotesize]above:Узел~2}] (n2) {};
+
+  \node[font=\large] (dots) at ($(tm2b)+(0,-1.0)$) {$\vdots$};
+
+  \node[tm, below=14mm of tm2b] (tm5a) {TaskManager};
+  \node[tm, below=2.5mm of tm5a] (tm5b) {TaskManager};
+  \node[nodebox, fit=(tm5a)(tm5b), label={[font=\footnotesize]below:Узел~5}] (n5) {};
+
+  \node[comp, below=24mm of jm, xshift=2mm] (s3) {Объектное хранилище\\(S3 / Apache Ozone):\\данные Paimon, метаданные,\\чекпойнты Flink};
+
+  % --- arrows ---
+  \draw[flow] (dev) -- node[above, sloped, font=\footnotesize]{ssh / Ansible} (jm);
+  \draw[flow] (dev.south) to[out=-60, in=180] node[below, font=\footnotesize, pos=0.35]{развёртывание, конфигурация} (s3.west);
+  \draw[flow] (jm.east) -- node[above, sloped, font=\footnotesize]{планирование задач} (n1.west);
+  \draw[flow] (jm.east) to[out=0, in=180] (n2.west);
+  \draw[flow] (jm.east) to[out=-25, in=180] (n5.west);
+  \draw[dataflow] (n1.south) to[out=-90, in=20] node[right, font=\footnotesize, pos=0.4]{чтение / запись} (s3.east);
+  \draw[dataflow] (n2.west) to[out=180, in=70] (s3.north east);
+  \draw[dataflow] (n5.south west) to[out=200, in=-30] (s3.south east);
+  \draw[flow] (s3.west) to[out=160, in=-100] node[left, font=\footnotesize, pos=0.6]{файл метрик} (jm.south);
+  \draw[flow] (jm.north) to[out=120, in=0] node[above, font=\footnotesize, pos=0.6]{выгрузка результатов} (dev.east);
+\end{tikzpicture}%
+}
+\caption{Схема развёртывания окружения нагрузочного тестирования: автоматизация через Ansible, кластер из пяти узлов (по два менеджера задач на узел), объектное хранилище как бэкенд данных и чекпойнтов}
+\label{fig:deployment}
+\end{figure}

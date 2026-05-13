@@ -1,0 +1,75 @@
+\appendixsection{Фрагменты исходного кода}
+
+В приложении приведены ключевые фрагменты разработанного модуля интеграции.
+Рисунок~\ref{src:native} --- объявление нативных методов доступа к библиотеке Vortex;
+рисунок~\ref{src:readbatch} --- метод чтения очередного пакета строк с экспортом в
+раскладку Apache Arrow без копирования; рисунок~\ref{src:create} --- фрагмент
+параметров создания таблицы near-real-time-сценария.
+
+\begin{figure}
+\begin{lstlisting}[language=Java]
+/** Нативные методы доступа к файлам формата Vortex. */
+public final class NativeFileMethods {
+    static { NativeLoader.loadJni(); }
+    private NativeFileMethods() {}
+
+    public static native List<String> listVortexFiles(String uri, Map<String,String> options);
+    public static native void   delete(String[] uris, Map<String,String> options);
+    public static native long   open(String uri, Map<String,String> options);
+    public static native long   rowCount(long pointer);
+    public static native long   dtype(long pointer);
+    public static native void   close(long pointer);
+    public static native long   scan(long pointer, List<String> columns,
+                                     byte[] predicateProto,
+                                     long[] rowRange, long[] rowIndices);
+}
+\end{lstlisting}
+\caption{Объявление нативных методов (\texttt{NativeFileMethods})}
+\label{src:native}
+\end{figure}
+
+\begin{figure}
+\begin{lstlisting}[language=Java]
+@Override
+public FileRecordIterator<InternalRow> readBatch() throws IOException {
+    if (!arrayIterator.hasNext()) return null;
+    releaseCurrentArray();
+    Array array = arrayIterator.next();          // нативный пакет
+    this.currentArray = array;
+    VectorSchemaRoot vsr = array.exportToArrow(allocator, reuse); // Arrow C Data Interface, zero-copy
+    this.reuse = vsr;
+    Iterator<InternalRow> rows = arrowBatchReader.readBatch(vsr).iterator();
+    return new FileRecordIterator<InternalRow>() {
+        @Override public long returnedPosition() { return returnedPosition; }
+        @Override public Path filePath()         { return filePath; }
+        @Override public InternalRow next() {
+            if (!rows.hasNext()) return null;
+            returnedPosition = positionIterator.next();
+            return rows.next();
+        }
+        @Override public void releaseBatch() { releaseCurrentArray(); }
+    };
+}
+\end{lstlisting}
+\caption{Чтение очередного пакета строк с экспортом в Apache Arrow (\texttt{VortexRecordsReader})}
+\label{src:readbatch}
+\end{figure}
+
+\begin{figure}
+\begin{lstlisting}[language=SQL]
+CREATE TABLE bench_table ( /* 25 столбцов */, PRIMARY KEY (id) NOT ENFORCED) WITH (
+  'file.format' = 'vortex',           -- варьируется: parquet | orc | vortex
+  'bucket' = '...', 'bucket-key' = 'id',
+  'sequence.field' = 'seq', 'rowkind.field' = 'op',
+  'changelog-producer' = 'none', 'deletion-vectors.enabled' = 'false',
+  'snapshot.num-retained.min' = '500', 'snapshot.num-retained.max' = '10000',
+  'snapshot.time-retained' = '24h', 'snapshot.expire.execution-mode' = 'async',
+  'manifest.merge-min-count' = '1000', 'consumer.expiration-time' = '24h',
+  'write-buffer-size' = '1GB',
+  'metadata.stats-mode' = 'full',     -- полные статистики (без усечения строк)
+  'write.batch-size' = '65536'        -- крупный пакет: меньше пересечений границы JNI
+);
+\end{lstlisting}
+\caption{Фрагмент параметров создания таблицы near-real-time-сценария}
+\label{src:create}
+\end{figure}

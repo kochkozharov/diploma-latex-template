@@ -1,0 +1,80 @@
+\documentclass[bachelor, fontsize=14]{diploma}
+
+% ──────────────────────────────────────────────────────────────────────────
+%  Дополнительные пакеты (в шаблоне diploma их нет)
+% ──────────────────────────────────────────────────────────────────────────
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, calc, fit, backgrounds, shapes.geometric, shapes.multipart}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{siunitx}
+
+% ──────────────────────────────────────────────────────────────────────────
+%  TODO: подтвердить данные титульного листа у автора
+% ──────────────────────────────────────────────────────────────────────────
+\student{Кочкожаров Иван Александрович}      % TODO: ФИО полностью
+\group{М8О-???Б-??}                           % TODO: номер учебной группы
+\theme{Применение колоночного формата Vortex в lakehouse-системе Apache Paimon и сравнительный анализ форматов хранения}
+
+\supervisor{Радионов М. С.}                   % TODO: ФИО научного руководителя
+\firstConsultant{}                            % TODO: консультант (если есть)
+\reviewer{}                                   % TODO: ФИО рецензента
+
+\faculty{№ 8 <<Компьютерные науки и прикладная математика>>}
+\department{806}                              % TODO: номер кафедры
+\speciality{01.03.02 <<Прикладная математика и информатика>>}  % TODO
+\profile{Информатика}                         % TODO: профиль
+
+\departmentFullName{№ 806}                    % TODO
+\headOfDepartment{}                           % TODO: зав. кафедрой
+
+\date{\uline{\hspace{24pt}} \the\year\ года}
+
+\input{contents/glossary}
+\input{contents/terms}
+
+\addbibresource{main.bib}
+
+\begin{document}
+    \maketitle
+
+    % \includepdf[pages=-]{extra/task} % Задание на ВКР (вкладывается отдельно)
+    \setcounter{page}{2}
+
+    \input{contents/0-abstract}        % РЕФЕРАТ
+
+    \tableofcontents                     % СОДЕРЖАНИЕ
+    \termsanddefenitions                 % ТЕРМИНЫ И ОПРЕДЕЛЕНИЯ
+    \listofabbreviations                 % ПЕРЕЧЕНЬ СОКРАЩЕНИЙ И ОБОЗНАЧЕНИЙ
+
+    \input{contents/1-introduction}    % ВВЕДЕНИЕ
+
+    % ── Раздел 1. Аналитический обзор ──
+    \input{contents/2-01-storage-evolution}
+    \input{contents/2-02-table-formats}
+    \input{contents/2-03-file-formats}
+    \input{contents/2-04-paimon-architecture}
+    \input{contents/2-05-encoding-skipping}
+    \input{contents/2-06-problem-statement}
+
+    % ── Раздел 2. Разработка и развёртывание ──
+    \input{contents/3-01-integration-module}
+    \input{contents/3-02-functional-testing}
+    \input{contents/3-03-cluster-deployment}
+    \input{contents/3-04-experiment-design}
+    \input{contents/3-05-issues}
+
+    % ── Раздел 3. Результаты экспериментов ──
+    \input{contents/4-01-results-tpcds}
+    \input{contents/4-02-results-streaming}
+    \input{contents/4-03-patterns-recommendations}
+
+    \input{contents/5-conclusion}      % ЗАКЛЮЧЕНИЕ
+
+    \printbibliography                    % СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ
+
+    \appendix                             % ПРИЛОЖЕНИЯ
+    \input{contents/6-appendix-a}
+    \input{contents/6-appendix-b}
+    \input{contents/6-appendix-c}
+\end{document}

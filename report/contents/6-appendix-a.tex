@@ -1,0 +1,33 @@
+\appendixsection{Исходные тексты проекта}
+
+Исходные тексты, использованные и разработанные в рамках работы, размещены в
+следующих репозиториях.
+
+\begin{enumerate}
+    \item Интеграция формата Vortex в Apache Paimon --- модули
+        \texttt{paimon-vortex-jni} и \texttt{paimon-vortex-format} в составе
+        ответвления Apache Paimon (на основе версии~1.4): реализация интерфейса
+        \texttt{FileFormat}, класс \texttt{VortexRecordsReader}, конвертер предикатов
+        \texttt{VortexPredicateConverter}, обёртки нативных методов
+        \texttt{NativeFileMethods}, сборка нативной библиотеки Vortex.
+    \item Нагрузочные задания --- задание потокового near-real-time-сценария
+        (\texttt{StreamingWriteBenchmarkJob}), задание-исполнитель TPC-DS
+        (\texttt{TpcdsBenchmarkJob}), задание пакетной записи
+        (\texttt{WriteBenchmarkJob}), сценарий-обёртка многоформатного прогона,
+        конфигурация сборки.
+    \item Развёртывание кластера --- роли и плейбуки Ansible (\texttt{start.yml},
+        \texttt{stop.yml}, \texttt{config-update.yml}, \texttt{submit-job.yml},
+        \texttt{krb-renew.yml}), шаблоны конфигурации Apache Flink.
+    \item Сборка артефактов и локальные функциональные тесты --- сборочные
+        контейнеры, конфигурация Docker Compose локального окружения, сценарии
+        smoke-тестов.
+    \item Результаты экспериментов --- файлы метрик TPC-DS и потокового сценария,
+        сценарий разбора и агрегации результатов.
+\end{enumerate}
+
+\textit{Замечание.} Конкретные URL репозиториев и хеши версий следует указать при
+финальном оформлении работы (в исходном проекте репозитории расположены в каталогах
+\texttt{paimon-deploy/paimon} --- ветка интеграции, \texttt{paimon-hdfs-job} ---
+нагрузочные задания, \texttt{flink-lang-deploy} --- развёртывание кластера,
+\texttt{paimon-deploy} --- сборка и локальные тесты, \texttt{paimon-benchmark-results}
+--- результаты).
