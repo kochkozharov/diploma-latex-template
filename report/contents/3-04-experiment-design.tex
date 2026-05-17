@@ -85,11 +85,17 @@ FINAL) повторяется несколько раз (число повтор
 влияют на медиану. Среднее приводится отдельно как индикатор подверженности
 формата выбросам.
 
-\begin{table}
-    \caption{Аналитические запросы near-real-time-сценария}
-    \label{tab:queries}
-    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.26\textwidth}|X|}\hline
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{0.40\textwidth}|X|}
+    \caption{Аналитические запросы near-real-time-сценария}\label{tab:queries} \\ \hline
     \textbf{Запрос} & \textbf{Содержание и проверяемый механизм} \\ \hline
+    \endfirsthead
+    \caption*{Продолжение таблицы~\ref{tab:queries}} \\ \hline
+    \textbf{Запрос} & \textbf{Содержание и проверяемый механизм} \\ \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
     \texttt{POINT} & выборка одной строки по первичному ключу; точечный доступ, фильтры Блума и статистики \\ \hline
     \texttt{FULLSCAN\_PROJ} & полное сканирование с проекцией; нет предиката --- проверяет «чистую» скорость декодирования и накладные расходы границы \\ \hline
     \texttt{RANGE\_SESSION} & диапазонный фильтр по \texttt{session\_id} (строка-префикс); FSST + пропуск файлов по статистикам строкового столбца \\ \hline
@@ -103,8 +109,7 @@ FINAL) повторяется несколько раз (число повтор
     \texttt{JOIN\_USER\_ACTIVITY} & соединение по \texttt{user\_id} с агрегацией по типу события; column pruning при соединении \\ \hline
     \texttt{JOIN\_SESSION\_LATENCY} & соединение по \texttt{session\_id} с диапазонным фильтром по задержке \\ \hline
     \texttt{JOIN\_REVENUE\_PROFILE} & подзапрос-сборка активных пользователей и соединение с их строками покупок; 5 из 25 столбцов \\ \hline
-    \end{tabularx}
-\end{table}
+\end{xltabular}
 
 \textbf{Параметры конфигурации.} По итогам предварительных запусков зафиксирован
 рабочий набор параметров: распределение слотов между записью и чтением (общая сумма
