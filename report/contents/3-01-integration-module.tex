@@ -77,59 +77,20 @@ Vortex показана на рисунке~\ref{fig:seq-read}.
 
 \begin{figure}
 \centering
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[
-    font=\footnotesize,
-    >={Stealth[length=2mm]},
-    head/.style={draw, rounded corners=1.5pt, align=center, minimum height=8mm, minimum width=20mm, fill=black!4},
-    msg/.style={->, thick},
-    ret/.style={->, dashed},
-  ]
-  % --- координаты времени жизни ---
-  \def\xA{0}      % Flink
-  \def\xB{3.6}    % Paimon FileFormat
-  \def\xC{7.2}    % VortexFileFormat
-  \def\xD{10.8}   % VortexRecordsReader
-  \def\xE{14.4}   % Vortex (Rust) via JNI
-  \def\ytop{0}
-  \def\ybot{-10.6}
-  % --- головы участников ---
-  \node[head] (A) at (\xA,\ytop) {Flink\\(движок)};
-  \node[head] (B) at (\xB,\ytop) {Apache Paimon\\\texttt{FileFormat}};
-  \node[head] (C) at (\xC,\ytop) {\texttt{VortexFile}\\\texttt{Format}};
-  \node[head] (D) at (\xD,\ytop) {\texttt{VortexRecords}\\\texttt{Reader}};
-  \node[head] (E) at (\xE,\ytop) {Vortex (Rust)\\через JNI};
-  % --- линии жизни ---
-  \foreach \x in {\xA,\xB,\xC,\xD,\xE} {
-    \draw[dashed, black!55] (\x,-0.45) -- (\x,\ybot);
-  }
-  % --- сообщения ---
-  % 1
-  \draw[msg] (\xA,-1.2) -- node[above]{\texttt{createReaderFactory(проекция, предикат)}} (\xB,-1.2);
-  % 2
-  \draw[msg] (\xB,-1.9) -- node[above]{\texttt{createReaderFactory(\dots)}} (\xC,-1.9);
-  % 3 self: convert predicate
-  \draw[msg] (\xC,-2.6) -- ++(1.0,0) -- ++(0,-0.5) -- node[right, xshift=2pt]{\texttt{convert()} — предикат $\to$ нативное выражение} ++(-1.0,0);
-  % 4 return factory
-  \draw[ret] (\xC,-3.7) -- node[above]{\texttt{FormatReaderFactory}} (\xB,-3.7);
-  % 5 new reader
-  \draw[msg] (\xB,-4.4) -- node[above]{\texttt{new VortexRecordsReader(путь, тип, предикат)}} (\xD,-4.4);
-  % 6 open + scan
-  \draw[msg] (\xD,-5.1) -- node[above]{\texttt{open(uri)}; \texttt{scan(столбцы, предикат)}} (\xE,-5.1);
-  \draw[ret] (\xE,-5.7) -- node[above]{итератор нативных массивов} (\xD,-5.7);
-  % --- loop frame ---
-  \draw[black!60] (-1.5,-6.2) rectangle (15.9,-9.3);
-  \node[draw, fill=white, font=\scriptsize\bfseries, anchor=north west] at (-1.5,-6.2) {loop [пока есть пакеты]};
-  % loop messages
-  \draw[msg] (\xA,-6.9) -- node[above]{\texttt{readBatch()}} (\xD,-6.9);
-  \draw[msg] (\xD,-7.6) -- node[above]{\texttt{next()}; \texttt{exportToArrow()}} (\xE,-7.6);
-  \draw[ret] (\xE,-8.2) -- node[above]{Arrow \texttt{VectorSchemaRoot} (без копирования)} (\xD,-8.2);
-  \draw[ret] (\xD,-8.9) -- node[above]{пакет строк (\texttt{InternalRow})} (\xA,-8.9);
-  % --- close ---
-  \draw[msg] (\xA,-9.8) -- node[above]{\texttt{close()}} (\xD,-9.8);
-  \draw[msg] (\xD,-10.4) -- node[above]{освобождение нативных ресурсов} (\xE,-10.4);
-\end{tikzpicture}%
-}
+\includegraphics[width=\textwidth]{contents/diagrams/sequence_read.drawio.pdf}
 \caption{Диаграмма последовательности: чтение таблицы Apache Paimon с файловым форматом Vortex}
 \label{fig:seq-read}
+\end{figure}
+
+Соответствующая последовательность взаимодействия компонентов при записи приведена
+на рисунке~\ref{fig:seq-write}. Запись инициируется приёмником Paimon в Flink на
+каждом чекпойнте: для каждого бакета, в который накопились изменения, создаётся
+файл; строки сбрасываются в нативный писатель Vortex пакетами; по закрытию файла
+формируются статистики для записи в манифест.
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{contents/diagrams/sequence_write.drawio.pdf}
+\caption{Диаграмма последовательности: запись в таблицу Apache Paimon с файловым форматом Vortex}
+\label{fig:seq-write}
 \end{figure}

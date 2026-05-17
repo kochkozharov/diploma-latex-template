@@ -39,43 +39,7 @@ Apache Iceberg с организацией данных в виде LSM-дере
 
 \begin{figure}
 \centering
-\begin{tikzpicture}[
-    font=\small,
-    box/.style={draw, rounded corners=2pt, minimum height=7mm, minimum width=14mm, align=center},
-    lvl/.style={font=\small\bfseries},
-    >={Stealth[length=2mm]}
-  ]
-  % memory buffer
-  \node[box, fill=black!5] (mem) at (0,3.4) {буфер в памяти\\(сортировка по ключу)};
-  % L0
-  \node[lvl] at (-4.6,2.2) {$L_0$};
-  \node[box, fill=black!8] (l0a) at (-3.2,2.2) {файл};
-  \node[box, fill=black!8] (l0b) at (-1.6,2.2) {файл};
-  \node[box, fill=black!8] (l0c) at (0.0,2.2) {файл};
-  \node at (1.4,2.2) {$\dots$};
-  % L1
-  \node[lvl] at (-4.6,1.0) {$L_1$};
-  \node[box, fill=black!12, minimum width=22mm] (l1a) at (-2.8,1.0) {файл};
-  \node[box, fill=black!12, minimum width=22mm] (l1b) at (-0.2,1.0) {файл};
-  % L2
-  \node[lvl] at (-4.6,-0.2) {$L_2$};
-  \node[box, fill=black!16, minimum width=34mm] (l2a) at (-2.0,-0.2) {файл};
-  \node[box, fill=black!16, minimum width=34mm] (l2b) at (2.0,-0.2) {файл};
-  % arrows
-  \draw[->] (mem) -- node[right]{\footnotesize flush по чекпойнту} (l0c);
-  \draw[->] (l0a) -- ($(l1a.north)+(-0.4,0)$);
-  \draw[->] (l0b) -- ($(l1a.north)+(0.4,0)$);
-  \draw[->, dashed] (l0c) -- (l1b.north);
-  \node[font=\footnotesize] at (3.3,1.55) {слияние ($L_0\!\to\!L_1$)};
-  \draw[->] (l1a) -- (l2a.north);
-  \draw[->] (l1b) -- ($(l2a.north)+(0.8,0)$);
-  \node[font=\footnotesize] at (3.6,0.45) {слияние ($L_1\!\to\!L_2$)};
-  % read side
-  \node[box, fill=black!5, minimum width=30mm] (rd) at (5.6,3.0) {итератор слияния\\при чтении};
-  \draw[->, thick] (l0c.east) to[out=0,in=180] ($(rd.west)+(0,0.3)$);
-  \draw[->, thick] (l1b.east) to[out=0,in=180] (rd.west);
-  \draw[->, thick] (l2b.east) to[out=0,in=180] ($(rd.west)+(0,-0.3)$);
-\end{tikzpicture}
+\includegraphics[width=\textwidth]{contents/diagrams/lsm.drawio.pdf}
 \caption{Устройство LSM-дерева бакета в Apache Paimon: буферизация в памяти, сброс в~\(L_0\) по чекпойнту, фоновое слияние на нижележащие уровни, объединение версий итератором слияния при чтении}
 \label{fig:lsm}
 \end{figure}
