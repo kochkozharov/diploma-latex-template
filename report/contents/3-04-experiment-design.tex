@@ -41,15 +41,17 @@ user-agent --- FSST), монотонные и узкодиапазонные ц�
 \begin{table}
     \caption{Схема таблицы near-real-time-витрины (25 столбцов)}
     \label{tab:schema}
-    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.16\textwidth}|>{\raggedright\arraybackslash}p{0.42\textwidth}|X|}\hline
+    {\small
+    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.22\textwidth}|>{\raggedright\arraybackslash}p{0.40\textwidth}|X|}\hline
     \textbf{Группа} & \textbf{Столбцы} & \textbf{Ожидаемые кодеки} \\ \hline
     Ключ и служебные & \texttt{id} (первичный ключ), \texttt{seq} (последовательность), \texttt{op} (вид изменения) & дельта / FOR; константа в фазе обновления \\ \hline
-    Категориальные строки & \texttt{country\_code}, \texttt{device\_type}, \texttt{os\_name}, \texttt{event\_type}, \texttt{request\_method}, \texttt{referrer\_host} & словарь, RLE \\ \hline
-    Строки с префиксами & \texttt{session\_id}, \texttt{request\_id}, \texttt{parent\_req\_id}, \texttt{url\_path}, \texttt{user\_agent}, \texttt{os\_version} & FSST \\ \hline
+    Категории & \texttt{country\_code}, \texttt{device\_type}, \texttt{os\_name}, \texttt{event\_type}, \texttt{request\_method}, \texttt{referrer\_host} & словарь, RLE \\ \hline
+    Префиксные строки & \texttt{session\_id}, \texttt{request\_id}, \texttt{parent\_req\_id}, \texttt{url\_path}, \texttt{user\_agent}, \texttt{os\_version} & FSST \\ \hline
     Целые & \texttt{user\_id}, \texttt{status\_code}, \texttt{latency\_ms}, \texttt{bytes\_sent}, \texttt{screen\_width}, \texttt{ad\_id} & FOR, бит-упаковка, дельта \\ \hline
-    Числа с плавающей точкой & \texttt{geo\_lat}, \texttt{geo\_lon}, \texttt{revenue} & ALP \\ \hline
+    С плавающей точкой & \texttt{geo\_lat}, \texttt{geo\_lon}, \texttt{revenue} & ALP \\ \hline
     Временная метка & \texttt{ts} & дельта \\ \hline
     \end{tabularx}
+    }
 \end{table}
 
 Эксперимент состоит из фаз. \textbf{INIT} --- начальная загрузка \num{50000000} строк
