@@ -75,13 +75,14 @@ DURING --- скромный (доли процента). При этом ORC и 
 работают в полной плотности.
 
 \begin{table}
-    \caption{Медиана времени выполнения запроса, мс (по всем запросам, выборкам и повторам)}
+    \caption{Время выполнения запроса, мс (по всем запросам, выборкам и повторам): медиана и среднее}
     \label{tab:read-med}
-    \begin{tabularx}{\textwidth}{|X|c|c|}\hline
-    \textbf{Формат} & \textbf{Фаза DURING} & \textbf{Фаза FINAL} \\ \hline
-    ORC     & 7756 & 7767 \\ \hline
-    Parquet & 7824 & 7797 \\ \hline
-    Vortex  & \textbf{7677} & \textbf{6004} \\ \hline
+    \begin{tabularx}{\textwidth}{|X|c|c|c|c|}\hline
+    \multirow{2}{*}{\textbf{Формат}} & \multicolumn{2}{c|}{\textbf{Фаза DURING}} & \multicolumn{2}{c|}{\textbf{Фаза FINAL}} \\ \hhline{~----}
+    & медиана & среднее & медиана & среднее \\ \hline
+    ORC     & 7756 & 7594 & 7767 & 7633 \\ \hline
+    Parquet & 7824 & 9481 & 7797 & 7767 \\ \hline
+    Vortex  & \textbf{7677} & \textbf{7712} & \textbf{6004} & \textbf{6736} \\ \hline
     \end{tabularx}
 \end{table}
 
