@@ -7,7 +7,7 @@
 Организация содержит следующие репозитории.
 
 \begin{itemize}
-    \item \textbf{\href{https://github.com/mai-diploma-kochkozharov/paimon}{\texttt{paimon}}}
+    \item \href{https://github.com/mai-diploma-kochkozharov/paimon}{\texttt{paimon}}
         (ветка \texttt{vortex-on-1.4.0-rc1}). Ответвление репозитория
         \texttt{apache/paimon} на базе версии~1.4. Содержит разработанные в
         рамках работы подмодули: \texttt{paimon-vortex-jni} (обёртки нативных
@@ -17,7 +17,7 @@
         предикатов \texttt{VortexPredicateConverter}), а также интегрированную
         сборку нативной библиотеки Vortex.
 
-    \item \textbf{\href{https://github.com/mai-diploma-kochkozharov/paimon-flink-job}{\texttt{paimon-flink-job}}}
+    \item \href{https://github.com/mai-diploma-kochkozharov/paimon-flink-job}{\texttt{paimon-flink-job}}
         (ветка \texttt{main}). Нагрузочные задания Apache Flink~+ Apache Paimon:
         задание потокового near-real-time-сценария
         \texttt{StreamingWriteBenchmarkJob}, задание пакетной записи
@@ -25,34 +25,34 @@
         \texttt{TpcdsBenchmarkJob}, сценарий-обёртка многоформатного прогона и
         Maven-конфигурация сборки.
 
-    \item \textbf{\href{https://github.com/mai-diploma-kochkozharov/flink-lang-deploy}{\texttt{flink-lang-deploy}}}
+    \item \href{https://github.com/mai-diploma-kochkozharov/flink-lang-deploy}{\texttt{flink-lang-deploy}}
         (ветка \texttt{master}). Развёртывание кластера Apache Flink средствами
         Ansible: роли установки и конфигурации, плейбуки
         \texttt{start.yml}, \texttt{stop.yml}, \texttt{config-update.yml},
         \texttt{submit-job.yml}, \texttt{krb-renew.yml}, шаблоны конфигурации
         Apache Flink, инвентарь кластера.
 
-    \item \textbf{\href{https://github.com/mai-diploma-kochkozharov/paimon-vortex-deploy}{\texttt{paimon-vortex-deploy}}}
+    \item \href{https://github.com/mai-diploma-kochkozharov/paimon-vortex-deploy}{\texttt{paimon-vortex-deploy}}
         (ветка \texttt{glibc-2.28}). Сборка артефактов в контейнерах с
         кросс-компиляцией нативной библиотеки Vortex под целевую версию
         системной библиотеки C кластера; конфигурация Docker Compose локального
         окружения для функциональных smoke-тестов; Makefile-цели сборки и
         запуска заданий.
 
-    \item \textbf{\href{https://github.com/mai-diploma-kochkozharov/vortex-jni-test}{\texttt{vortex-jni-test}}}
+    \item \href{https://github.com/mai-diploma-kochkozharov/vortex-jni-test}{\texttt{vortex-jni-test}}
         (ветка \texttt{master}). Изолированный проект для тестирования слоя
         доступа к нативной библиотеке Vortex через Java Native Interface:
         проверка корректности экспорта данных в Apache Arrow без копирования,
         граничные случаи кодеков, отладка нативных вызовов вне основного
         конвейера Paimon.
 
-    \item \textbf{\href{https://github.com/mai-diploma-kochkozharov/paimon-benchmark-results}{\texttt{paimon-benchmark-results}}}
+    \item \href{https://github.com/mai-diploma-kochkozharov/paimon-benchmark-results}{\texttt{paimon-benchmark-results}}
         (ветка \texttt{master}). Результаты экспериментов и сценарии их обработки:
         файлы метрик TPC-DS и потокового сценария в формате CSV, сценарий разбора
         и агрегации \texttt{parse\_writebench.py} (поддерживает вычисление как
         среднего, так и медианы).
 
-    \item \textbf{\href{https://github.com/mai-diploma-kochkozharov/diploma-latex-template}{\texttt{diploma-latex-template}}}
+    \item \href{https://github.com/mai-diploma-kochkozharov/diploma-latex-template}{\texttt{diploma-latex-template}}
         (ветка \texttt{vkr-kochkozharov}). Исходные тексты настоящей выпускной
         квалификационной работы: \LaTeX-шаблон оформления, исходные
         \texttt{.tex}-файлы по разделам, конфигурация сборки (\texttt{latexmk},

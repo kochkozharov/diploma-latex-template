@@ -7,7 +7,7 @@
 обновления --- порядка 100\,000~строк/с, объём фазы обновления --- около
 \num{200000000} строк, интервал чекпойнтов --- 240~с).
 
-\textbf{Запись.} Пропускная способность фазы начальной загрузки (последовательные
+Запись. Пропускная способность фазы начальной загрузки (последовательные
 ключи, реальная запись на диск) практически одинакова у всех трёх форматов
 (таблица~\ref{tab:write}); различие в пределах разброса. В фазе обновления показатели
 также близки, но интерпретируются с оговоркой: при постоянном значении поля
@@ -28,7 +28,7 @@
     \end{tabularx}
 \end{table}
 
-\textbf{Объём хранилища.} Размер таблицы после полного цикла записи приведён в
+Объём хранилища. Размер таблицы после полного цикла записи приведён в
 таблице~\ref{tab:nrt-size}. ORC даёт самый компактный результат, Parquet --- на
 \SI{6}{\percent} больше, Vortex --- на \SI{18}{\percent} больше ORC. Различие в
 пределах нескольких процентов сопоставимо с разбросом и не влияет на стоимость
@@ -47,24 +47,24 @@
     \label{tab:nrt-size}
     \begin{tabularx}{\textwidth}{|X|c|c|c|}\hline
     \textbf{Формат} & \textbf{Объём, ГиБ} & \textbf{Число объектов} & \textbf{Отношение к ORC} \\ \hline
-    ORC     & \textbf{17} & 1731 & ${\times}1.00$ \\ \hline
+    ORC     & 17 & 1731 & ${\times}1.00$ \\ \hline
     Parquet & 18 & 1733 & ${\times}1.06$ \\ \hline
     Vortex  & 20 & 1883 & ${\times}1.18$ \\ \hline
     \end{tabularx}
 \end{table}
 
-\textbf{Замечание о метрике усреднения.} В DURING-фазе отдельные сэмплы чтения
+Замечание о метрике усреднения. В DURING-фазе отдельные сэмплы чтения
 могут попадать на момент массового сброса данных по чекпойнту, когда writer
 одновременно пишет в объектное хранилище и данные таблицы, и состояние чекпойнта
 Flink (последнее размещается в той же директории объектного хранилища). Такое
 совпадение даёт единичные «хвостовые» сэмплы длительностью в десятки секунд;
 среднее по сэмплам, особенно при небольшом числе повторов, чувствительно к таким
-попаданиям. Поэтому в качестве основной метрики далее используется \textit{медиана}
+попаданиям. Поэтому в качестве основной метрики далее используется медиана
 по выборкам и повторам --- она отражает типичную задержку чтения, к которой и
 чувствителен потребитель витрины данных, и устойчива к единичным выбросам.
 Среднее приводится отдельно как индикатор подверженности формата выбросам.
 
-\textbf{Чтение: типичная задержка (медиана).} Сводные результаты приведены в
+Чтение: типичная задержка (медиана). Сводные результаты приведены в
 таблице~\ref{tab:read-med}. По медиане Vortex --- быстрейший формат в обеих фазах:
 в фазе FINAL отрыв заметный ($\approx 23\,\%$ относительно ORC и Parquet), в фазе
 DURING --- скромный (доли процента). При этом ORC и Parquet по медиане практически
@@ -82,12 +82,12 @@ DURING --- скромный (доли процента). При этом ORC и 
     & медиана & среднее & медиана & среднее \\ \hline
     ORC     & 7756 & 7594 & 7767 & 7633 \\ \hline
     Parquet & 7824 & 9481 & 7797 & 7767 \\ \hline
-    Vortex  & \textbf{7677} & \textbf{7712} & \textbf{6004} & \textbf{6736} \\ \hline
+    Vortex  & 7677 & 7712 & 6004 & 6736 \\ \hline
     \end{tabularx}
 \end{table}
 
-\textbf{Чтение: фаза FINAL по запросам.} Подробные результаты по медиане приведены в
-таблице~\ref{tab:read-final} (полужирным выделено наименьшее по строке). Vortex
+Чтение: фаза FINAL по запросам. Подробные результаты по медиане приведены в
+таблице~\ref{tab:read-final}. Vortex
 выигрывает на девяти запросах из тринадцати; ORC --- на двух
 (\texttt{AGG\_COUNT\_DISTINCT}, \texttt{AGG\_SUM\_BYTES}, разница в пределах
 единиц процентов); Parquet --- на двух (\texttt{AGG\_GROUP\_COUNTRY},
@@ -104,24 +104,24 @@ DURING --- скромный (доли процента). При этом ORC и 
     \label{tab:read-final}
     \begin{tabularx}{\textwidth}{|X|c|c|c|}\hline
     \textbf{Запрос} & \textbf{ORC} & \textbf{Parquet} & \textbf{Vortex} \\ \hline
-    \texttt{POINT}                  & 3841  & 4169  & \textbf{3780} \\ \hline
-    \texttt{FULLSCAN\_PROJ}          & 5888  & 5839  & \textbf{5829} \\ \hline
-    \texttt{RANGE\_SESSION}          & 5837  & 7851  & \textbf{5826} \\ \hline
-    \texttt{RANGE\_URL}              & 5823  & 5873  & \textbf{5787} \\ \hline
-    \texttt{AGG\_SUM\_BYTES}         & \textbf{5703}  & 5868  & 5808 \\ \hline
-    \texttt{AGG\_COUNT\_DISTINCT}    & \textbf{7823}  & 9870  & 7842 \\ \hline
-    \texttt{AGG\_FILTERED}           & 9805  & 9874  & \textbf{7783} \\ \hline
-    \texttt{AGG\_GROUP\_COUNTRY}     & 5804  & \textbf{5778}  & 5825 \\ \hline
-    \texttt{AGG\_MULTIDIM}           & 7863  & \textbf{6407}  & 7922 \\ \hline
-    \texttt{FUNNEL}                  & 12303 & 12162 & \textbf{8221} \\ \hline
-    \texttt{JOIN\_USER\_ACTIVITY}    & 8134  & 10120 & \textbf{8044} \\ \hline
-    \texttt{JOIN\_SESSION\_LATENCY}  & 10077 & 8103  & \textbf{7992} \\ \hline
-    \texttt{JOIN\_REVENUE\_PROFILE}  & 7709  & 8147  & \textbf{6195} \\ \hline
-    \multicolumn{1}{|r|}{\textbf{выигрышей}} & 2 & 2 & \textbf{9} \\ \hline
+    \texttt{POINT}                  & 3841  & 4169  & 3780 \\ \hline
+    \texttt{FULLSCAN\_PROJ}          & 5888  & 5839  & 5829 \\ \hline
+    \texttt{RANGE\_SESSION}          & 5837  & 7851  & 5826 \\ \hline
+    \texttt{RANGE\_URL}              & 5823  & 5873  & 5787 \\ \hline
+    \texttt{AGG\_SUM\_BYTES}         & 5703  & 5868  & 5808 \\ \hline
+    \texttt{AGG\_COUNT\_DISTINCT}    & 7823  & 9870  & 7842 \\ \hline
+    \texttt{AGG\_FILTERED}           & 9805  & 9874  & 7783 \\ \hline
+    \texttt{AGG\_GROUP\_COUNTRY}     & 5804  & 5778  & 5825 \\ \hline
+    \texttt{AGG\_MULTIDIM}           & 7863  & 6407  & 7922 \\ \hline
+    \texttt{FUNNEL}                  & 12303 & 12162 & 8221 \\ \hline
+    \texttt{JOIN\_USER\_ACTIVITY}    & 8134  & 10120 & 8044 \\ \hline
+    \texttt{JOIN\_SESSION\_LATENCY}  & 10077 & 8103  & 7992 \\ \hline
+    \texttt{JOIN\_REVENUE\_PROFILE}  & 7709  & 8147  & 6195 \\ \hline
+    \multicolumn{1}{|r|}{выигрышей} & 2 & 2 & 9 \\ \hline
     \end{tabularx}
 \end{table}
 
-\textbf{Чтение: фаза DURING по запросам.} Результаты приведены в
+Чтение: фаза DURING по запросам. Результаты приведены в
 таблице~\ref{tab:read-during}. По медиане Vortex также выигрывает большинство
 запросов (девять из тринадцати). Наибольший отрыв --- на запросах, где работает
 проталкивание предиката и плотное кодирование строк с регулярной структурой:
@@ -138,24 +138,24 @@ Parquet --- на точечном запросе и полном сканиро�
     \label{tab:read-during}
     \begin{tabularx}{\textwidth}{|X|c|c|c|}\hline
     \textbf{Запрос} & \textbf{ORC} & \textbf{Parquet} & \textbf{Vortex} \\ \hline
-    \texttt{POINT}                  & 3724  & \textbf{3706}  & 3721 \\ \hline
-    \texttt{FULLSCAN\_PROJ}          & 5845  & \textbf{5773}  & 5812 \\ \hline
-    \texttt{RANGE\_SESSION}          & 7800  & 17684 & \textbf{5863} \\ \hline
-    \texttt{RANGE\_URL}              & 5932  & 6133  & \textbf{5718} \\ \hline
-    \texttt{AGG\_SUM\_BYTES}         & 5716  & 5746  & \textbf{5672} \\ \hline
-    \texttt{AGG\_COUNT\_DISTINCT}    & 7877  & 13700 & \textbf{7755} \\ \hline
-    \texttt{AGG\_FILTERED}           & 8035  & 9789  & \textbf{7679} \\ \hline
-    \texttt{AGG\_GROUP\_COUNTRY}     & \textbf{5776}  & 5776  & 5803 \\ \hline
-    \texttt{AGG\_MULTIDIM}           & \textbf{5926}  & 7696  & 5953 \\ \hline
-    \texttt{FUNNEL}                  & 12005 & 11999 & \textbf{10193} \\ \hline
-    \texttt{JOIN\_USER\_ACTIVITY}    & 7998  & 8094  & \textbf{7971} \\ \hline
-    \texttt{JOIN\_SESSION\_LATENCY}  & 8024  & 8091  & \textbf{8006} \\ \hline
-    \texttt{JOIN\_REVENUE\_PROFILE}  & 8097  & 8179  & \textbf{8085} \\ \hline
-    \multicolumn{1}{|r|}{\textbf{выигрышей}} & 2 & 2 & \textbf{9} \\ \hline
+    \texttt{POINT}                  & 3724  & 3706  & 3721 \\ \hline
+    \texttt{FULLSCAN\_PROJ}          & 5845  & 5773  & 5812 \\ \hline
+    \texttt{RANGE\_SESSION}          & 7800  & 17684 & 5863 \\ \hline
+    \texttt{RANGE\_URL}              & 5932  & 6133  & 5718 \\ \hline
+    \texttt{AGG\_SUM\_BYTES}         & 5716  & 5746  & 5672 \\ \hline
+    \texttt{AGG\_COUNT\_DISTINCT}    & 7877  & 13700 & 7755 \\ \hline
+    \texttt{AGG\_FILTERED}           & 8035  & 9789  & 7679 \\ \hline
+    \texttt{AGG\_GROUP\_COUNTRY}     & 5776  & 5776  & 5803 \\ \hline
+    \texttt{AGG\_MULTIDIM}           & 5926  & 7696  & 5953 \\ \hline
+    \texttt{FUNNEL}                  & 12005 & 11999 & 10193 \\ \hline
+    \texttt{JOIN\_USER\_ACTIVITY}    & 7998  & 8094  & 7971 \\ \hline
+    \texttt{JOIN\_SESSION\_LATENCY}  & 8024  & 8091  & 8006 \\ \hline
+    \texttt{JOIN\_REVENUE\_PROFILE}  & 8097  & 8179  & 8085 \\ \hline
+    \multicolumn{1}{|r|}{выигрышей} & 2 & 2 & 9 \\ \hline
     \end{tabularx}
 \end{table}
 
-\textbf{Среднее vs медиана и подверженность выбросам.} Соотнесение среднего и
+Среднее vs медиана и подверженность выбросам. Соотнесение среднего и
 медианы по DURING-фазе полезно для оценки тяжести хвостов задержки. Для ORC
 среднее (7594~мс) и медиана (7756~мс) практически совпадают, для Vortex среднее
 (7712~мс) и медиана (7677~мс) также совпадают --- это означает, что у обоих
@@ -176,7 +176,7 @@ Parquet --- на точечном запросе и полном сканиро�
 читатель ORC реже простаивает в очереди за соединением, даже когда общий пул под
 нагрузкой.
 
-\textbf{Промежуточные выводы по сценарию.} Vortex эквивалентен Parquet и ORC по
+Промежуточные выводы по сценарию. Vortex эквивалентен Parquet и ORC по
 пропускной способности записи (гипотеза~2 подтверждена). По типичной задержке
 чтения (медиана) Vortex --- быстрейший формат в обеих фазах и на большинстве
 запросов (девять из тринадцати в каждой фазе); особенно выраженно --- на запросах

@@ -9,6 +9,12 @@
 \usepackage{multirow}
 \usepackage{siunitx}
 
+% ГОСТ 7.32-2017 п. 6.5.7 / 6.6.3: «Таблица N — Название», «Рисунок N — Название» через ТИРЕ (em-dash «—»),
+% а не среднее тире «–». Шаблон по умолчанию использует endash; переопределяем.
+\DeclareCaptionLabelSeparator{emdash}{ \textemdash\ }
+\captionsetup[table]{labelsep=emdash}
+\captionsetup[figure]{labelsep=emdash}
+
 \student{Кочкожаров Иван Вячеславович}
 \group{М8О-408Б-22}
 \theme{Модуль интеграции колоночного файлового формата Vortex в открытый табличный формат и сравнение со стандартными файловыми форматами}
