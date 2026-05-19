@@ -80,11 +80,17 @@ LSM-дерева; эта гипотеза рассмотрена и отклон
 Сводная характеристика рассматриваемых форматов приведена в
 таблице~\ref{tab:formats-overview}.
 
-\begin{table}
-    \caption{Сравнительная характеристика колоночных файловых форматов}
-    \label{tab:formats-overview}
-    \begin{tabularx}{\textwidth}{|l|X|X|}\hline
+\begin{xltabular}{\textwidth}{|l|X|X|}
+    \caption{Сравнительная характеристика колоночных файловых форматов}\label{tab:formats-overview} \\ \hline
     \textbf{Формат} & \textbf{Реализация чтения} & \textbf{Отличительные черты} \\ \hline
+    \endfirsthead
+    \caption*{Продолжение таблицы~\ref{tab:formats-overview}} \\ \hline
+    \textbf{Формат} & \textbf{Реализация чтения} & \textbf{Отличительные черты} \\ \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
     Parquet & JVM (\texttt{parquet-mr}, затенённая сборка в Paimon) &
         группы строк и страницы; словарное / RLE / bit-packing кодирование; блочное сжатие; статистики и фильтры Блума; зрелый универсальный формат \\ \hline
     ORC & JVM (\texttt{orc-core}) &
@@ -95,5 +101,4 @@ LSM-дерева; эта гипотеза рассмотрена и отклон
         быстрый произвольный доступ к строкам; векторные индексы; ориентация на нагрузки машинного обучения \\ \hline
     Avro & JVM &
         строчный формат; дёшев на запись; нет поколоночного сжатия, column pruning и статистик; в сравнение не включён \\ \hline
-    \end{tabularx}
-\end{table}
+\end{xltabular}
